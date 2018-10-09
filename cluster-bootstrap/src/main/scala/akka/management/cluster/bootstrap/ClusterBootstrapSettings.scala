@@ -86,6 +86,8 @@ final class ClusterBootstrapSettings(config: Config) {
   object contactPoint {
     private val contactPointConfig = bootConfig.getConfig("contact-point")
 
+    val connectByIP = contactPointConfig.getBoolean("connect-by-ip")
+
     // FIXME this has to be the same as the management one, we currently override this value when starting management, any better way?
     val fallbackPort = contactPointConfig.getInt("fallback-port")
 
