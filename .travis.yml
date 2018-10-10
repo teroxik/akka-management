@@ -19,12 +19,17 @@ jobs:
   - stage: test
     script:
     - git branch -f "$TRAVIS_BRANCH" && git checkout "$TRAVIS_BRANCH"
+    - jdk_switcher use oraclejdk8
     - sbt -J-XX:ReservedCodeCacheSize=128m ";+test:compile;docs/paradox"
     - git diff --exit-code --color || { echo "[error] Unformatted code found. Please run 'test:compile' and commit the reformatted code."; false; }
-  - script: sbt -J-XX:ReservedCodeCacheSize=128m "+test"
+  - script:
+    - jdk_switcher use oraclejdk8
+    - sbt -J-XX:ReservedCodeCacheSize=128m "+test"
   - script: ./scripts/setup-minikube-for-linux.sh && ./bootstrap-demo/kubernetes-api/test.sh
   - stage: whitesource
-    script: sbt 'set credentials += Credentials("whitesource", "whitesourcesoftware.com", "", System.getenv("WHITESOURCE_KEY"))' whitesourceCheckPolicies whitesourceUpdate
+    script:
+    - jdk_switcher use oraclejdk8
+    - sbt 'set credentials += Credentials("whitesource", "whitesourcesoftware.com", "", System.getenv("WHITESOURCE_KEY"))' whitesourceCheckPolicies whitesourceUpdate
 
 stages:
   - name: check
@@ -38,6 +43,7 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
+    - jdk_switcher use oraclejdk8
     - sbt -J-XX:ReservedCodeCacheSize=128m +publish && curl -I https://ci.lightbend.com/job/techhub-publisher/build?token=$TECH_HUB_TOKEN
   on:
     tags: true
